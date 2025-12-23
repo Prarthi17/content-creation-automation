@@ -1,0 +1,527 @@
+{
+  "name": "Content creation automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        112
+      ],
+      "id": "af8bfdb9-2eab-4f95-9524-891f152f4c69",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a47d75f0-0d58-436d-bb20-a212dddd1793",
+              "name": "keywords",
+              "value": "marketing, branding, automation, customer service, sales, SEO, content marketing, influencer marketing, email marketing, social media, analytics, AI, growth hacking, lead generation, PPC, advertising, video marketing, storytelling, engagement, copywriting, conversion rate, customer experience, loyalty, retention, online marketing, blog, website optimization, mobile marketing, UX, UI, design, chatbot, CRM, personalization, social media ads, hashtags, keyword research, affiliate marketing, marketing strategy, inbound marketing, outbound marketing, viral marketing, social listening, digital campaigns, marketing funnel, brand awareness, SEO audit, link building, content strategy, webinars, podcasting, branding strategy, brand identity, digital advertising, remarketing, retargeting, marketing automation, e-commerce, customer journey, influencer outreach, email automation, newsletter, online presence, marketing analytics, metrics, ROI, engagement rate, click-through rate, impressions, reach, traffic, organic search, paid search, display ads, programmatic advertising, mobile apps, app marketing, push notifications, SMS marketing, A/B testing, landing page optimization, conversion optimization, CRO, lead nurturing, customer segmentation, audience targeting, market research, competitor analysis, trend analysis, hashtag strategy, social media management, social media scheduling, content calendar, user-generated content, micro-influencers, nano-influencers, thought leadership, community management, social media growth, brand storytelling, customer advocacy, brand positioning, marketing campaigns, omnichannel marketing, digital transformation, AI tools, chatbots, machine learning, predictive analytics, recommendation engines, personalization engines, customer insights, marketing tools, marketing software, campaign tracking, engagement metrics, analytics dashboards, video ads, live streaming, TikTok marketing, Instagram marketing, Facebook ads, YouTube ads, LinkedIn marketing, Twitter marketing, Pinterest marketing, Snapchat marketing, social commerce, influencer partnerships, brand collaborations, content creation, creative marketing, viral content, meme marketing, interactive content, gamification, experiential marketing, brand loyalty programs, referral marketing, affiliate programs, B2B marketing, B2C marketing, SaaS marketing, app store optimization, product marketing, market segmentation, customer feedback, online reputation, review management, public relations, press releases",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        112
+      ],
+      "id": "7d3f7a77-3264-413f-95db-7754b34bca53",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the first incoming item\nconst firstItem = $input.first();\n\n// Get the comma-separated keywords\nconst keywordsString = firstItem.json.keywords;\n\n// Split into an array\nconst keywords = keywordsString.split(\",\");\n\n// Pick a random keyword\nconst randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];\n\n// Return as output\nreturn [\n  {\n    json: {\n      keyword: randomKeyword\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        112
+      ],
+      "id": "fd01e8b6-e869-4494-9db5-8c36c52d7e74",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=https://newsapi.org/v2/everything",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json.keyword}}"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "sortBy",
+              "value": "publishedAt"
+            },
+            {
+              "name": "pageSize",
+              "value": "10"
+            },
+            {
+              "name": "apiKey",
+              "value": "15936e3a1270435ea9e2674ff381f70a"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "a20ac2a9-55cd-458d-a165-ad88d3fea7ae",
+      "name": "newzapi"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "q",
+              "value": "={{$json.keyword}}"
+            },
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "maxResults",
+              "value": "10"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyCflLS83WYBsXMgEPJ8Mi6Xptv-a1J-_AE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "87aa5ed5-f086-4371-82aa-2328b6371a02",
+      "name": "youtubeapi"
+    },
+    {
+      "parameters": {
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1664,
+        112
+      ],
+      "id": "44488a9a-56f2-4074-ac75-d0c8bbf58fb7",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        352
+      ],
+      "id": "4c968660-420b-4411-907c-4ec8143ad419",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "li3Zd63rEgtYJ9Op",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Collect YouTube & News Items ---\nconst youtubeItems = [];\nconst newsItems = [];\n\nfor (const item of $input.all()) {\n    if (item.json.source === \"youtube\") {\n        youtubeItems.push(item.json);\n    }\n    if (item.json.source === \"news\") {\n        newsItems.push(item.json);\n    }\n}\n\n// --- Convert YouTube Data ---\nconst youtubeDataStr = youtubeItems.map(v => {\n    const id = v.id?.videoId || \"\";\n    return `\nTitle: ${v.snippet?.title || \"\"}\nDescription: ${v.snippet?.description || \"\"}\nURL: https://www.youtube.com/watch?v=${id}\n`;\n}).join(\"\\n---\\n\");\n\n// --- Convert News Data ---\nconst newsDataStr = newsItems.map(n => {\n    return `\nTitle: ${n.title || \"\"}\nDescription: ${n.description || \"\"}\nURL: ${n.url || \"\"}\n`;\n}).join(\"\\n---\\n\");\n\n// --- Keyword fallback ---\nconst keyword = youtubeItems[0]?.keyword || \"general\";\n\n// --- Build final LLM prompt (JSON ONLY) ---\nconst chatInput = `\nAnalyze the trending content related to the keyword '${keyword}' and generate EXACTLY 10 actionable content topic ideas.\n\nEach topic idea MUST follow this structure:\n{\n  \"number\": 1,\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"sentiment\": \"string\",        // positive / neutral / negative\n  \"score\": 0-10,                // engagement score\n  \"virality\": 0-10              // potential to trend\n}\n\nReturn ONLY THIS EXACT JSON FORMAT:\n\n{\n  \"topics\": [\n    {\n      \"number\": 1,\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"sentiment\": \"string\",\n      \"score\": 0,\n      \"virality\": 0\n    }\n  ]\n}\n\nDo NOT add explanations.  \nDo NOT add text outside JSON.\n\nYOUTUBE DATA:\n${youtubeDataStr}\n\nNEWS DATA:\n${newsDataStr}\n`;\n\nreturn [{ json: { chatInput } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        112
+      ],
+      "id": "831218b6-a0bb-413d-a10a-e03d494b90c0",
+      "name": "chatInput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items (LLM returns one item)\nconst items = $input.all();\n\n// Gemini returns the text response in .json.text\nlet output = items[0].json.text;\n\n// Error if .text does not exist\nif (!output) {\n    throw new Error(\"Gemini did not return a 'text' field. Full response: \" + JSON.stringify(items[0].json));\n}\n\n// STEP 1 — Normalize output to string\nif (typeof output === \"object\") {\n    output = JSON.stringify(output);\n}\n\n// STEP 2 — Remove code-block fences (```json ... ```)\noutput = output\n    .replace(/```json/gi, \"\")\n    .replace(/```/g, \"\")\n    .trim();\n\n// STEP 3 — Extract the first valid JSON object\nconst jsonMatch = output.match(/\\{[\\s\\S]*\\}/);\n\nif (!jsonMatch) {\n    throw new Error(\"No JSON found in LLM output. Raw output: \" + output);\n}\n\nlet jsonString = jsonMatch[0];\n\n// STEP 4 — Parse JSON safely\nlet data;\ntry {\n    data = JSON.parse(jsonString);\n} catch (err) {\n    throw new Error(\"JSON parsing failed. Extracted JSON: \" + jsonString);\n}\n\n// STEP 5 — Validate structure\nif (!data.topics || !Array.isArray(data.topics)) {\n    throw new Error(\"Missing 'topics' array. Full parsed JSON: \" + JSON.stringify(data));\n}\n\n// STEP 6 — RETURN ARRAY OF ITEMS (required by n8n)\n// Include new fields: Sentiment, EngagementScore, Virality\nreturn data.topics.map(topic => ({\n    json: {\n        TopicNumber: topic.number || \"\",\n        Title: topic.title || \"\",\n        Description: topic.description || \"\",\n        Sentiment: topic.sentiment || \"\",\n        EngagementScore: topic.score || \"\",\n        Virality: topic.virality || \"\"\n    }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        112
+      ],
+      "id": "3eacd554-5553-48d5-b79e-6c66a0ae74e0",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/17mPGTOIX2C8OPyVsXr5elKiciex9laWDGUler69II2Y/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17mPGTOIX2C8OPyVsXr5elKiciex9laWDGUler69II2Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TopicNumber",
+              "displayName": "TopicNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2224,
+        112
+      ],
+      "id": "7978bb7a-0bac-45ba-bc15-394dfe0ea370",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TrgCRgyQen7hxMrk",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.EngagementScore }}",
+                    "rightValue": 8,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "54344bd5-9460-41d4-8654-3b3dba27c086"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "engagementscore"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "68a474d5-f776-4cb6-837d-2b94377b705d",
+                    "leftValue": "={{ $json.Virality }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "virality"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        2432,
+        112
+      ],
+      "id": "5f89e696-ffa7-4622-b4fb-99b5229951c0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2576,
+        96
+      ],
+      "id": "c5d6f8b1-0722-4b91-9d90-447d11f27eb5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A0UH7RQRW",
+          "mode": "list",
+          "cachedResultName": "trending-content-alerts"
+        },
+        "text": "={{ $json.Title }}{{ $json.Description }}{{ $json.Sentiment }}{{ $json.EngagementScore }}{{ $json.Virality }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2784,
+        96
+      ],
+      "id": "cfadb5a0-0ee4-4aab-bc2c-048e22a8f73b",
+      "name": "Send a message",
+      "webhookId": "87476408-25ae-4831-903f-72365027cb49",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "J2pBmO6AxnnloSjR",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "newzapi",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "youtubeapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "newzapi": {
+      "main": [
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "youtubeapi": {
+      "main": [
+        [
+          {
+            "node": "chatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatInput": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fc22488a-cef2-4ac7-8e59-708053de1d9a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd9f0c669540398271e310dd8a92f8656d565b74d630fee8ac6c968f0e9a9c5a"
+  },
+  "id": "Ju4GuIudaseuD83I",
+  "tags": []
+}
