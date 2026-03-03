@@ -84,7 +84,7 @@
             },
             {
               "name": "apiKey",
-              "value": "15936e3a1270435ea9e2674ff381f70a"
+              "value": "enteryourapi"
             }
           ]
         },
@@ -123,7 +123,7 @@
             },
             {
               "name": "key",
-              "value": "AIzaSyCflLS83WYBsXMgEPJ8Mi6Xptv-a1J-_AE"
+              "value": "yourkey"
             }
           ]
         },
@@ -349,7 +349,7 @@
         "select": "channel",
         "channelId": {
           "__rl": true,
-          "value": "C0A0UH7RQRW",
+          "value": "enter",
           "mode": "list",
           "cachedResultName": "trending-content-alerts"
         },
